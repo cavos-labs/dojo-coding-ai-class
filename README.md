@@ -9,7 +9,7 @@ Ejemplo de como hacer una app completa en Starknet, con contratos y cliente.
 
 ## 📝 Descripción del Proyecto
 
-Este proyecto es un ejemplo completo de una aplicación descentralizada (dApp) en StarkNet que incluye:
+Este proyecto es un ejemplo completo de una aplicación descentralizada (dApp) en Starknet que incluye:
 
 - **Smart Contract**: Contrato de lotería implementado en Cairo
 - **Frontend**: Aplicación web Next.js con integración de wallet
@@ -35,7 +35,7 @@ dojo-coding-ai-class/
 │   │   └── test_contract.cairo   # Tests del contrato
 │   ├── Scarb.toml               # Configuración de Scarb
 │   └── target/                  # Archivos compilados
-├── starknet-ex-app/             # Frontend Next.js
+├── Starknet-ex-app/             # Frontend Next.js
 │   ├── app/
 │   │   ├── components/          # Componentes React
 │   │   │   └── WalletButton.tsx # Componente de wallet
@@ -51,7 +51,7 @@ dojo-coding-ai-class/
 
 ### Prerequisites
 
-1. **Instalación de herramientas Cairo/StarkNet:**
+1. **Instalación de herramientas Cairo/Starknet:**
    - Scarb
    - Snfoundry
    - Sncast
@@ -165,3 +165,166 @@ sncast call \
    ```
    http://localhost:3000
    ```
+
+## Contratos
+### Pasos
+
+1.
+
+   ```bash
+    scarb init --name contracts
+    cd contracts
+   ```
+
+2.
+    IMPORTANTE: cada una de estas funciones debe ser desarrollada y enviada al Cairo coder una por una para seguir las mejores prácticas. Cairo coder no funciona como un LLM tradicional; si le das demasiadas tareas a la vez, fallará.
+
+    ```
+    Cairo coder Prompt: "Create a comprehensive Cairo lottery contract called StarknetLotto with these features:
+    - Owner can set winning numbers (only owner access)
+    - Users can buy tickets with specific numbers (no mapping)
+    - Each user can only buy one ticket
+    - Track total ticket count and user tickets using Map, use this code to implement:
+    ```
+    ```
+    #[Starknet::contract]
+    mod UserValues {
+        use Starknet::storage::{
+            Map, StoragePathEntry, StoragePointerReadAccess, StoragePointerWriteAccess,
+        };
+        use Starknet::{ContractAddress, get_caller_address};
+
+        #[storage]
+        struct Storage {
+            user_values: Map<ContractAddress, u64>,
+        }
+
+        #[abi(embed_v0)]
+        impl UserValuesImpl of super::IUserValues<ContractState> {
+            fn set(ref self: ContractState, amount: u64) {
+                let caller = get_caller_address();
+                self.user_values.entry(caller).write(amount);
+            }
+
+            fn get(self: @ContractState, address: ContractAddress) -> u64 {
+                self.user_values.entry(address).read()
+            }
+        }
+    }
+    ```
+    ```
+    - Determine winner by matching ticket numbers with winning number
+    - Return zero address if no winner found
+
+    Requirements:
+    - Use latest Cairo syntax (2.11.4)
+    - Implement proper storage patterns
+    - Include comprehensive interface definition
+    - Add proper access controls for owner functions
+    - Follow Starknet development best practices"
+    ```
+
+4.
+
+    ```bash
+    # Build the contract
+    scarb build
+
+    # Run comprehensive test suite
+    snforge test
+    ```
+
+5.
+   ```bash
+   sncast account create \
+     --name my_account \
+     --network sepolia
+   ```
+
+   ```bash
+   sncast account deploy \
+     --network sepolia \
+     --name my_account
+   ```
+
+   ```bash
+   sncast \
+     --account my_account \
+     declare \
+     --contract-name StarknetLotto \
+     --network sepolia
+   ```
+
+   ```bash
+   sncast \
+     --account my_account \
+     deploy \
+     --class-hash 0x[TU_CLASS_HASH] \
+     --arguments 0x[TU_DIRECCION_COMO_OWNER] \
+     --network sepolia
+   ```
+
+## Cliente
+### Pasos
+
+1.
+
+    ```bash
+    npx create-next-app@latest Starknet-ex-app --typescript --tailwind --eslint --app
+    cd Starknet-ex-app
+    npm install @cavos/aegis
+    ```
+
+2.
+
+    ```
+    Claude Prompt: "Implement this context provider on my layout:
+    import { AegisProvider } from '@cavos/aegis';
+
+    export default function App() {
+      return (
+        <AegisProvider
+          config={{
+            network: 'SN_SEPOLIA',
+            appName: 'MyApp',
+            appId: 'your-unique-app-id',
+            paymasterApiKey: 'your-avnu-api-key',
+            enableLogging: true
+          }}
+        >
+          {/* Your app */}
+        </AegisProvider>
+      );
+    }
+
+    Implement this button on my page.tsx, delete everything else:
+    import { useAegis } from '@cavos/aegis';
+
+    function WalletButton() {
+      const { isConnected, currentAddress, deployWallet, disconnect, aegisAccount } = useAegis();
+
+      if (isConnected) {
+        return (
+          <View>
+            <Text>Connected: {currentAddress}</Text>
+            <Button onPress={disconnect} title="Disconnect" />
+          </View>
+        );
+      }
+
+      return <Button onPress={deployWallet} title="Create Wallet" />;
+    }
+    "
+    ```
+
+3.
+    ```
+    Claude Prompt: "Create a lottery interface in page.tsx with buttons for these functions:
+    - set_winning_number (with input field)
+    - get_winning_number
+    - get_owner
+    - buy_ticket (with input field)
+    - get_user_ticket (with address input)
+    - get_ticket_count
+    - determine_winner
+    ```
