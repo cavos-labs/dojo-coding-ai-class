@@ -6,6 +6,7 @@ Ejemplo de como hacer una app completa en Starknet, con contratos y cliente.
 2. [Estructura del Proyecto](#estructura-del-proyecto)
 3. [Configuración del Entorno](#configuración-del-entorno)
 4. [Deploy de Contratos con Sncast](#deploy-de-contratos-con-sncast)
+5. [Pasos](#pasos)
 
 ## 📝 Descripción del Proyecto
 
@@ -172,19 +173,20 @@ sncast call \
 1.
 
    ```bash
-    scarb init --name contracts
+    mkdir contracts
     cd contracts
+    scarb init --name contracts
    ```
 
 2.
     IMPORTANTE: cada una de estas funciones debe ser desarrollada y enviada al Cairo coder una por una para seguir las mejores prácticas. Cairo coder no funciona como un LLM tradicional; si le das demasiadas tareas a la vez, fallará.
 
     ```
-    Cairo coder Prompt: "Create a comprehensive Cairo lottery contract called StarknetLotto with these features:
-    - Owner can set winning numbers (only owner access)
-    - Users can buy tickets with specific numbers (no mapping)
-    - Each user can only buy one ticket
-    - Track total ticket count and user tickets using Map, use this code to implement:
+    Cairo coder Prompt: "Create a comprehensive Cairo lottery contract called StarknetLotto using Cairo 2.12.2, remove everything from lib.cairo
+
+    - Owner can set winning number (only owner access), constructor should receive the owner address
+    - Users can buy tickets with specific numbers (no mapping), emit an event when a number is bought
+    - Track total ticket count and user tickets using Map, use this code to implement, each user can only buy one ticket:
     ```
     ```
     #[Starknet::contract]
@@ -213,11 +215,10 @@ sncast call \
     }
     ```
     ```
-    - Determine winner by matching ticket numbers with winning number
-    - Return zero address if no winner found
+    - Determine winner by matching ticket numbers with winning number use a loop to determine the winner
 
     Requirements:
-    - Use latest Cairo syntax (2.11.4)
+    - Use latest Cairo syntax (2.12.2)
     - Implement proper storage patterns
     - Include comprehensive interface definition
     - Add proper access controls for owner functions
@@ -259,8 +260,8 @@ sncast call \
    sncast \
      --account my_account \
      deploy \
-     --class-hash 0x[TU_CLASS_HASH] \
-     --arguments 0x[TU_DIRECCION_COMO_OWNER] \
+     --class-hash 0x6d0bc737f26b365f96c7b9c5b8b0467df651ed73576b9817d7f50d79d3c78e6 \
+     --arguments 0x03d57e5e7421a70396a69274e8dd57dadfc5e38541d27e7a742116c3ef34bb33 \
      --network sepolia
    ```
 
