@@ -260,8 +260,8 @@ sncast call \
    sncast \
      --account my_account \
      deploy \
-     --class-hash 0x6d0bc737f26b365f96c7b9c5b8b0467df651ed73576b9817d7f50d79d3c78e6 \
-     --arguments 0x03d57e5e7421a70396a69274e8dd57dadfc5e38541d27e7a742116c3ef34bb33 \
+     --class-hash 0x68aff410ee15f04470122e3d6f90043beeaf481604323fe79c859e77421ed5c \
+     --arguments 0x06f58A6581F348180A4A8EF0f6a2168cef1a53874A3ec1980D35FFB9b4227948 \
      --network sepolia
    ```
 
@@ -271,12 +271,14 @@ sncast call \
 1.
 
     ```bash
-    npx create-next-app@latest Starknet-ex-app --typescript --tailwind --eslint --app
-    cd Starknet-ex-app
+    npx create-next-app@latest starknet-ex-app --typescript --tailwind --eslint --app
+    cd starknet-ex-app
     npm install @cavos/aegis
     ```
 
-2.
+2. Agrega 'use client' en 'layout.tsx', elimina la metadata de la pagina, esto para poder usar el provider de in app wallets.
+
+3.
 
     ```
     Claude Prompt: "Implement this context provider on my layout:
@@ -318,7 +320,7 @@ sncast call \
     "
     ```
 
-3.
+4.
     ```
     Claude Prompt: "Create a lottery interface in page.tsx with buttons for these functions:
     - set_winning_number (with input field)
@@ -329,3 +331,7 @@ sncast call \
     - get_ticket_count
     - determine_winner
     ```
+
+5. Usa las funciones de 'aegisAccount' para llamar hacer read/write en el contrato.
+
+https://www.npmjs.com/package/@cavos/aegis
